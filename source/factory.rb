@@ -27,15 +27,15 @@ class Factory
         instance_variable_set property, value
       end
 
-      def each(&block)
+      def each
         instance_variables.each do |property|
-          block.call instance_variable_get property
+          yield instance_variable_get property
         end
       end
 
-      def each_pair(&block)
+      def each_pair
         instance_variables.each do |property|
-          block.call property, instance_variable_get(property)
+          yield property, instance_variable_get(property)
         end
       end
 
