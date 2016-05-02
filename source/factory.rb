@@ -3,49 +3,44 @@ class Factory
     struct_name = (properties[0].is_a? String) ? properties.shift : ''
 
     clazz = Class.new do
-      @properties = properties
+      attr_accessor *properties
 
-      def initialize(*args)
-        self.class.properties.each_with_index do |property, index|
-          instance_variable_set "@#{property}", args[index]
+      define_method :initialize do |*args|
+        properties.each_with_index do |var, index|
+          instance_variable_set "@#{var}", args[index]
         end
       end
 
       def ==(object)
-        return (not object.nil?) && self.class.properties.all? do |property|
-          eval "#{property} == object.#{property}"
+        return (not object.nil?) && instance_variables.all? do |property|
+          instance_variable_get(property) == object.instance_variable_get(property)
         end
       end
 
-      def [](index)
-        index = self.class.properties[index] if index.is_a? Fixnum
-        instance_variable_get "@#{index}"
+      def [](property)
+        property = (property.is_a? Fixnum) ? instance_variables[property] : "@#{property}"
+        instance_variable_get property
       end
 
-      def []=(index, value)
-        index = self.class.properties[index] if index.is_a? Fixnum
-        instance_variable_set "@#{index}", value
+      def []=(property, value)
+        property = (property.is_a? Fixnum) ? instance_variables[property] : "@#{property}"
+        instance_variable_set property, value
       end
 
       def each(&block)
-        self.class.properties.each do |property|
-          block.call instance_variable_get "@#{property}"
+        instance_variables.each do |property|
+          block.call instance_variable_get property
         end
       end
 
       def each_pair(&block)
-        self.class.properties.each do |property|
-          block.call property, instance_variable_get("@#{property}")
+        instance_variables.each do |property|
+          block.call property, instance_variable_get(property)
         end
       end
 
-      def self.properties
-        @properties
-      end
-
-      properties.each do |property|
-        define_method("#{property}") { instance_variable_get "@#{property}" }
-        define_method("#{property}=") { |value| instance_variable_set "@#{property}", value }
+      def length
+        instance_variables.length
       end
 
       class_eval &block if block_given?

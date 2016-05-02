@@ -34,6 +34,10 @@ RSpec.describe Factory do
     @structure_objects.each { |structure| expect(structure).not_to be_nil }
   end
 
+  it 'should has the same length' do
+    @structure_objects.each { |structure| expect(structure.length).to eq 2 }
+  end
+
   it 'should has getters' do
     @structure_objects.each do |structure|
       expect(structure.name).to eq @name
@@ -89,6 +93,18 @@ RSpec.describe Factory do
 
       structure[:surname] = @surname
       expect(structure[:surname]).to eq @surname
+    end
+  end
+
+  it 'should print twice values of all properties in the struct', skip: true do
+    @structure_objects.each do |structure|
+      structure.each { |value| puts value }
+    end
+  end
+
+  it 'should print twice names and values of all properties in the struct', skip: true do
+    @structure_objects.each do |structure|
+      structure.each_pair { |property, value| puts "#{property} => #{value}" }
     end
   end
 end
